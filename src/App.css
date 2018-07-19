@@ -1,0 +1,17 @@
+
+#messages-box {
+    height: 87.5vh;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+#message-enter {
+    height: 12.5vh;
+    width: 100%;
+    overflow: auto;
+}
+
+/*
+ *
+*/
