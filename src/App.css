@@ -1,17 +1,38 @@
 
+/*
+ * Controls the side pane where users are displayed.
+ */
+.side-pane {
+    height: 100vh;
+    width: 18vw;
+    background: blue;
+    float: left;
+    text-align: center;
+}
+
+.center-pane {
+    float: center;
+}
+
+/*
+ * Controls the appearance and functionality of the pane where the
+ * chat messages are dsiplayed as well as where the messages are 
+ * entered.
+ */
+
 #messages-box {
     height: 87.5vh;
     overflow-y: scroll;
     display: flex;
     flex-direction: column-reverse;
+    background: grey
 }
 
 #message-enter {
-    height: 12.5vh;
-    width: 100%;
+    height: 12vh;
+    width: 80vw;
     overflow: auto;
+    background: #FFB6C1;
+    text-alignt: left;
 }
 
-/*
- *
-*/
