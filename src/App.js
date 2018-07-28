@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
+// Needs to be redone, doesn't work.
 function UserList(props) {
 
     let users = new Set();
@@ -56,15 +57,19 @@ class UserSettings extends Component {
 
    render() {
        return (
-           <form onSubmit={this.handleSubmit}>
+           <div id="settings-area">
+           <p>Settings</p>
+           <form id="user-settings" onSubmit={this.handleSubmit}>
            <label>
            name: 
-           <input type="text"
+           <input id="settings-input"
+                  type="text"
                   value={this.state.username}
                   onChange={this.handleChange} />
            </label>
            <input type="submit" value="Change" />
            </form>
+           </div>
        )
    }
 }
@@ -73,18 +78,15 @@ class MessageBox extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { user: this.props.user,
-                       message: ''};
+        this.state = { message: '' };
         this.handleChange = this.handleChange.bind(this);
         this.onEnterPress = this.onEnterPress.bind(this);
-
       //this.handleSubmit = this.handleSubmit.bind(this);
 
     }
 
     handleChange(event) {
-        this.setState({ message: event.target.value,
-                        user: this.props.user});
+        this.setState({ message: event.target.value })
         event.preventDefault();
     }
     
@@ -103,8 +105,10 @@ class MessageBox extends Component {
         if (event.keyCode === 13 && event.shiftKey === false) {
             event.preventDefault();
 
-            this.props.socket.send(JSON.stringify(
-                    this.state));
+            var data = { user: this.props.user,
+                         message: this.state.message }
+
+            this.props.socket.send(JSON.stringify(data));
 
             this.setState({ message: '' });
         }
@@ -131,7 +135,7 @@ class App extends Component {
         this.state = {
             ws: new WebSocket('ws://localhost:1337'),
             history: [],
-            user: 'default'
+            user: 'default',
         }
         
         // Collection of event handlers for WebSockets.

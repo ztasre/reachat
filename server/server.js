@@ -1,6 +1,7 @@
 #!/bin/env node
 
 const WebSocket = require('ws');
+const uuid = require('uuid')
 
 const wss = new WebSocket.Server({ port: 1337 });
 
