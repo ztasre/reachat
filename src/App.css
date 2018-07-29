@@ -3,6 +3,7 @@
  * Controls the side pane where users are displayed.
  */
 .side-pane {
+    padding-top: 10px;
     height: 100vh;
     width: 18vw;
     float: left;

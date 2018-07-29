@@ -1,14 +1,44 @@
 import React, { Component } from 'react';
 import './App.css';
+import uuidv4 from 'uuid/v4';
 
-// Needs to be redone, doesn't work.
+function idGenerator() {
+    return uuidv4();
+}
+
+//Works, but it's a bit clunky. 
 function UserList(props) {
 
-    let users = new Set();
+    let users = {};
 
-    props.history.map( (item) => users.add(item.user) );
+    props.history.map( item => {
+        if (users.hasOwnProperty(item.id)) {
+            let temp = users[item.id];
 
-    const usersList = users.forEach( (user) => 
+            if (temp[temp.length - 1] !== item.user) {
+                users[item.id].push(item.user);
+            }
+        } else {
+            users[item.id] = [item.user];
+        }}
+    );
+
+    function latestUsers(userhist) {
+        let latest = [];
+        for (var property in userhist) {
+            if (userhist.hasOwnProperty(property)) {
+
+                let temp = userhist[property];
+
+                latest.push(temp[temp.length - 1]);
+            }
+        }
+        return latest;
+    }
+    
+    const latest = latestUsers(users);
+    
+    const usersList = latest.map( (user) => 
         <li key={user.toString()}>
             {user}
         </li>
@@ -24,7 +54,7 @@ function UserList(props) {
 function MessageList(props) {
     
     const elements = props.history.map( (item) =>
-            <li key={item.toString()}>
+            <li key={idGenerator()}>
                 {item.user}: {item.message}
             </li>
         );
@@ -106,7 +136,8 @@ class MessageBox extends Component {
             event.preventDefault();
 
             var data = { user: this.props.user,
-                         message: this.state.message }
+                         message: this.state.message,
+                         id: this.props.id }
 
             this.props.socket.send(JSON.stringify(data));
 
@@ -141,15 +172,16 @@ class App extends Component {
         // Collection of event handlers for WebSockets.
         this.state.ws.onopen = () => {
             console.log('connection established')
-            //this.state.ws.send('connection established')
         }
 
         this.state.ws.onmessage = (e) => {
             //console.log(e.data)
+            let data = JSON.parse(e.data);
+            
             this.setState({
-                history: JSON.parse(e.data)
+                history: data.history,
+                id: data.id,
             })
-            //console.log(this.state.history);
         }
 
 
@@ -179,7 +211,8 @@ class App extends Component {
         <section className="center-pane">
         <MessageList history={this.state.history}/>
         <MessageBox socket={this.state.ws}
-                    user={this.state.user}/> 
+                    user={this.state.user}
+                     id={this.state.id}/> 
         </section>
         </div>
     );

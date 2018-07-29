@@ -1,12 +1,11 @@
 #!/bin/env node
 
 const WebSocket = require('ws');
-const uuid = require('uuid')
+const uuidv4 = require('uuid/v4')
 
 const wss = new WebSocket.Server({ port: 1337 });
 
 let history = [];
-let users = []
 
 wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
@@ -17,15 +16,26 @@ wss.broadcast = function broadcast(data) {
 }
 
 wss.on('connection', function connections(ws) {
+
+    let userid = uuidv4();
+
+    let data = { history: history,
+                 id: userid };
     
     // initial message sent upon connection to server
-    ws.send(JSON.stringify(history));
+    ws.send(JSON.stringify(data));
     
     ws.on('message', function incoming(message) {
+       
         console.log(message);
-        history.push(JSON.parse(message));
-        wss.broadcast(JSON.stringify(history));
+        var unpacked = JSON.parse(message);
+
+        history.push(unpacked);
+
+        let data = { history: history,
+                     id: userid };
+
+        wss.broadcast(JSON.stringify(data));
     });
 
 });
-
