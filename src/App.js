@@ -10,7 +10,8 @@ function idGenerator() {
 function UserList(props) {
 
     let users = {};
-
+    
+    // this can be moved to the server potentially
     props.history.map( item => {
         if (users.hasOwnProperty(item.id)) {
             let temp = users[item.id];
@@ -138,7 +139,8 @@ class MessageBox extends Component {
 
             var data = { user: this.props.user,
                          message: this.state.message,
-                         id: this.props.id }
+                         id: this.props.id,
+                         ticket: this.props.ticket}
 
             this.props.socket.send(JSON.stringify(data));
 
@@ -163,11 +165,14 @@ class MessageBox extends Component {
 class App extends Component {
     constructor(props) {
         super(props)
-
+        
+        // change ws to wss once ssl is set up
         this.state = {
             ws: new WebSocket('ws://localhost:1337'),
             history: [],
             user: 'default',
+            id: '',
+            ticket: ''
         }
         
         // Collection of event handlers for WebSockets.
@@ -178,11 +183,20 @@ class App extends Component {
         this.state.ws.onmessage = (e) => {
             //console.log(e.data)
             let data = JSON.parse(e.data);
-            
-            this.setState({
-                history: data.history,
-                id: data.id,
-            })
+
+            if (data.type === 'initial') {
+
+                this.setState({
+                    history: data.history,
+                    id: data.id,
+                    ticket: data.ticket,
+                })
+            } else if (data.type === 'broadcast') {
+
+                this.setState({
+                    history: data.history
+                })
+            }
         }
 
 
@@ -213,7 +227,8 @@ class App extends Component {
         <MessageList history={this.state.history}/>
         <MessageBox socket={this.state.ws}
                     user={this.state.user}
-                     id={this.state.id}/> 
+                     id={this.state.id}
+                    ticket={this.state.ticket}/> 
         </section>
         </div>
     );

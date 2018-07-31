@@ -6,6 +6,7 @@ const uuidv4 = require('uuid/v4')
 const wss = new WebSocket.Server({ port: 1337 });
 
 let history = [];
+let verification = {};
 
 /* TODO
  
@@ -37,10 +38,18 @@ function timeStamp(obj) {
 wss.on('connection', function connections(ws) {
 
     let userid = uuidv4();
-    console.log(userid);
 
-    let data = { history: history,
-                 id: userid };
+    let ticket = { ticketID: uuidv4(), 
+                   timestamp: new Date()};
+
+    console.log('A new user joined: ', userid);
+
+    verification[userid] = ticket;
+    
+    let data = { type: 'initial',
+                 history: history,
+                 id: userid,
+                 ticket: ticket.ticketID};
     
     // initial message sent upon connection to server
     ws.send(JSON.stringify(data));
@@ -49,12 +58,20 @@ wss.on('connection', function connections(ws) {
        
         console.log(message);
         var unpacked = JSON.parse(message);
-        unpacked.timestamp = timeStamp(new Date());
 
+        /* quick user verifcation happens here */
+
+        if (verification[unpacked.id].ticketID !== unpacked.ticket ){
+            console.log('something went wrong', 
+                        'id: ',
+                        unpacked.id);
+        }
+
+        unpacked.timestamp = timeStamp(new Date());
         history.push(unpacked);
 
-        let data = { history: history,
-                     id: userid };
+        let data = { type: 'broadcast',
+                     history: history};
 
         wss.broadcast(JSON.stringify(data));
     });
