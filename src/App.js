@@ -35,8 +35,9 @@ function UserList(props) {
         }
         return latest;
     }
-    
+     
     const latest = latestUsers(users);
+    console.log(latest)
     
     const usersList = latest.map( (user) => 
         <li key={user.toString()}>
@@ -55,7 +56,7 @@ function MessageList(props) {
     
     const elements = props.history.map( (item) =>
             <li key={idGenerator()}>
-                {item.user}: {item.message}
+            {item.timestamp}> {item.user}: {item.message}
             </li>
         );
 
